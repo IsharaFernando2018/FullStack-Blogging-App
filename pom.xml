@@ -100,13 +100,17 @@
 	</build>
 	
 	<distributionManagement>
-        <repository>
+	<repository>
+        	<id>maven-releases</id>
+        	<url>http://host.docker.internal:8081/repository/maven-releases/</url>
+    	</repository>
+<!--         <repository>
             <id>maven-releases</id>
             <url>http://localhost:8081/repository/maven-releases/</url>
-        </repository>
+        </repository> -->
         <snapshotRepository>
             <id>maven-snapshots</id>
-            <url>http://localhost:8081/repository/maven-snapshots/</url>
+            <url>http://host.docker.internal:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
