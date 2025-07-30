@@ -5,9 +5,11 @@ pipeline {
         maven 'maven'
         jdk 'jdk17'
     }
+    
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
     }
+    
     stages {
         stage('clean workspace'){
             steps{
@@ -27,8 +29,7 @@ pipeline {
             }
         }
 
-        
-         stage('TRIVY FS SCAN') {
+        stage('TRIVY FS SCAN') {
             steps {
                 sh 'trivy fs --format table -o fs.html .'
             }
@@ -48,8 +49,7 @@ pipeline {
             }
         }
         
-        
-         stage('Publish Artifacts') {
+        stage('Publish Artifacts') {
             steps {
                 withMaven(globalMavenSettingsConfig: 'maven-settings', jdk: 'jdk17', maven: 'maven', mavenSettingsConfig: '', traceability: true) {
                      sh "mvn deploy"
@@ -57,58 +57,49 @@ pipeline {
             }
         }
         
-        // stage("Docker Build & Tag"){
-        //     steps{
-        //         script{
-        //             withDockerRegistry(credentialsId: 'docker') {
-        //                 sh "docker build -t ferdi2018/bloggingapp:latest ."
-        //                 }
-        //         }
-        //     }
-        // }
-        
         stage("Docker Build & Tag"){
-    steps{
-        script{
-            echo "Current directory:"
-            sh "pwd"
-            echo "Files:"
-            sh "ls -l"
-            
-            // Test docker connectivity
-            sh "docker info"
-            
-            // Run docker build with output capture
-            def output = sh(script: "docker build -t ferdi2018/bloggingapp:latest .", returnStdout: true).trim()
-            echo "Docker Build output:\n${output}"
-        }
-    }
-}
-
-        
-         stage('TRIVY Image SCAN') {
-            steps {
-                sh 'trivy image --format table --timeout 30m -o image.html ferdi2018/bloggingapp:latest'
-            }
-        }
-
-        
-        stage("Push Image"){
             steps{
                 script{
                     withDockerRegistry(credentialsId: 'docker') {
-                        sh "docker push ferdi2018/bloggingapp:latest"
+                        sh "docker build -t ferdi2018/bloggingapp:latest ."
                         }
                 }
             }
         }
         
-        stage('Hello') {
+        // stage("Docker Build & Tag"){
+        //     steps{
+        //         script{
+        //             echo "Current directory:"
+        //             sh "pwd"
+        //             echo "Files:"
+        //             sh "ls -l"
+            
+        //             // Test docker connectivity
+        //             sh "docker info"
+            
+        //             // Run docker build with output capture
+        //             def output = sh(script: "docker build -t ferdi2018/bloggingapp:latest .", returnStdout: true).trim()
+        //             echo "Docker Build output:\n${output}"
+        //         }
+        //     }
+        // }
+
+        stage('TRIVY Image SCAN') {
             steps {
-                echo 'Hello World'
+                sh 'trivy image --format table --timeout 30m -o image.html ferdi2018/bloggingapp:latest'
             }
         }
-        
+
+        stage("Push Image"){
+            steps{
+                script{
+                    withDockerRegistry(credentialsId: 'docker') {
+                        sh "docker push ferdi2018/bloggingapp:latest"
+                    }
+                }
+            }
+        }      
     }
 }
 
