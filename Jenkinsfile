@@ -67,24 +67,6 @@ pipeline {
             }
         }
         
-        // stage("Docker Build & Tag"){
-        //     steps{
-        //         script{
-        //             echo "Current directory:"
-        //             sh "pwd"
-        //             echo "Files:"
-        //             sh "ls -l"
-            
-        //             // Test docker connectivity
-        //             sh "docker info"
-            
-        //             // Run docker build with output capture
-        //             def output = sh(script: "docker build -t ferdi2018/bloggingapp:latest .", returnStdout: true).trim()
-        //             echo "Docker Build output:\n${output}"
-        //         }
-        //     }
-        // }
-
         stage('TRIVY Image SCAN') {
             steps {
                 sh 'trivy image --format table --timeout 30m -o image.html ferdi2018/bloggingapp:latest'
